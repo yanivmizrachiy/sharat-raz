@@ -256,3 +256,17 @@ sharat-raz (UI/PWA)
 - מחשב סלון מחובר ועובד דרך SSH + Tailscale
 - writeback עובד
 - השלב האחרון שנותר: אימות מלא של מסך/מצלמה וחיבור מחשב חדר מחשב
+
+
+## Reliability Layer
+- נוסף watchdog אמיתי
+- נוסף system health snapshot
+- נוסף runtime diagnostics snapshot
+- יש מנגנון שמונע listener כפול
+- יש מנגנון שמונע API כפול
+- אם listener או API חסרים, ה-watchdog מרים אותם מחדש
+- קבצים:
+  - CONTROL/system_health.json
+  - reports/runtime_diagnostics.json
+  - ~/server-core/services/watchdog.sh
+  - ~/server-core/services/run-health-cycle.sh
