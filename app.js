@@ -45,6 +45,32 @@ async function sendCommand(target, action, params = {}) {
   }
 }
 
+async function loadButtons() {
+  try {
+    const data = await api("/buttons");
+    const groups = data.buttons || {};
+    const host = document.querySelector(".buttons");
+    if (!host) return;
+    host.innerHTML = "";
+    Object.entries(groups).forEach(([group, items]) => {
+      const title = document.createElement("h3");
+      title.textContent = group;
+      title.style.gridColumn = "1 / -1";
+      host.appendChild(title);
+
+      items.forEach(item => {
+        const btn = document.createElement("button");
+        btn.className = "quick";
+        btn.textContent = item.label;
+        btn.addEventListener("click", () => sendCommand(item.target, item.action, item.params || {}));
+        host.appendChild(btn);
+      });
+    });
+  } catch (e) {
+    el("output").textContent = "שגיאת טעינת כפתורים: " + e.message;
+  }
+}
+
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
@@ -60,18 +86,6 @@ el("installBtn")?.addEventListener("click", async () => {
 });
 
 el("refreshBtn")?.addEventListener("click", refreshStatus);
-
-document.querySelectorAll(".quick").forEach(btn => {
-  btn.addEventListener("click", async () => {
-    const action = btn.dataset.action;
-    if (action === "open-github") return location.href = "https://github.com/yanivmizrachiy/sharat-raz";
-    if (action === "open-my-assistant") return location.href = "https://github.com/yanivmizrachiy/my-assistant";
-    if (action === "open-server-core") return location.href = "https://github.com/yanivmizrachiy/server-core";
-    if (action === "salon-connect") return sendCommand("pc", "hostname", {});
-    if (action === "room-connect") return sendCommand("room-pc", "hostname", {});
-    if (action === "status") return refreshStatus();
-  });
-});
 
 el("sendBtn")?.addEventListener("click", async () => {
   const target = el("target").value.trim();
@@ -89,5 +103,6 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js").catch(console.error);
 }
 
+loadButtons();
 refreshStatus();
 setInterval(refreshStatus, 8000);

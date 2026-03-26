@@ -3,10 +3,12 @@ import json, os, subprocess, time, uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 HOME = os.path.expanduser("~")
+APP_DIR = os.path.join(HOME, "sharat-raz")
 CONTROL_DIR = os.path.join(HOME, "my-assistant")
 STATE_DIR = os.path.join(CONTROL_DIR, "STATE")
 NEXT_FILE = os.path.join(STATE_DIR, "NEXT_COMMAND.json")
 LAST_FILE = os.path.join(STATE_DIR, "LAST_RESULT.json")
+BUTTONS_FILE = os.path.join(APP_DIR, "CONTROL", "buttons.json")
 API_PORT = 8791
 
 os.makedirs(STATE_DIR, exist_ok=True)
@@ -79,6 +81,9 @@ class H(BaseHTTPRequestHandler):
         if self.path == "/health":
             return self._send(200, {"ok": True, "service": "sharat-raz-api", "port": API_PORT, "ts": time.time()})
 
+        if self.path == "/buttons":
+            return self._send(200, {"ok": True, "buttons": read_json(BUTTONS_FILE, {})})
+
         if self.path == "/status":
             last = read_json(LAST_FILE, {})
             nxt = read_json(NEXT_FILE, {})
@@ -97,7 +102,6 @@ class H(BaseHTTPRequestHandler):
     def do_POST(self):
         if self.path != "/command":
             return self._send(404, {"ok": False, "error": "not_found"})
-
         try:
             length = int(self.headers.get("Content-Length","0"))
             body = self.rfile.read(length).decode("utf-8")
@@ -126,12 +130,7 @@ class H(BaseHTTPRequestHandler):
 
         write_json(NEXT_FILE, payload)
         git_steps = git_sync_queue()
-
-        return self._send(200, {
-            "ok": True,
-            "queued": payload,
-            "git": git_steps
-        })
+        return self._send(200, {"ok": True, "queued": payload, "git": git_steps})
 
 def main():
     server = ThreadingHTTPServer(("127.0.0.1", API_PORT), H)
