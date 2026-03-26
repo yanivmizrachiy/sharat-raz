@@ -82,6 +82,7 @@ async function loadButtons(){
   });
 }
 
+loadFastPaths();
 loadButtons();
 refreshStatus();
 setInterval(refreshStatus,8000);
@@ -110,3 +111,23 @@ setInterval(loadLatestScreenshot, 12000);
 setTimeout(loadLatestScreenshot, 1000);
 
 let LIVE=null; function startLive(){if(LIVE)return;LIVE=setInterval(loadLatestScreenshot,2000);} function stopLive(){if(LIVE){clearInterval(LIVE);LIVE=null;}}
+
+async function loadFastPaths() {
+  try {
+    const res = await fetch("./CONTROL/fast_paths.json?ts=" + Date.now());
+    const data = await res.json();
+    const host = document.getElementById("fastPaths");
+    if (!host) return;
+    host.innerHTML = "";
+    (data.favorites || []).forEach(item => {
+      const btn = document.createElement("button");
+      btn.className = "quick";
+      btn.textContent = item.label;
+      btn.onclick = () => sendCommand(item.target, item.action, {}, item.label);
+      host.appendChild(btn);
+    });
+  } catch (e) {
+    const box = el("errorBox");
+    if (box) box.textContent = "שגיאת גישה מהירה: " + e.message;
+  }
+}

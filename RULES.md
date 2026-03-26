@@ -338,3 +338,10 @@ sharat-raz (UI/PWA)
 - נוספו sc-live-start ו-sc-live-stop
 - LIVE שומר PID ומצב ריצה אמיתי
 - נמנעת הרצה כפולה של LIVE
+
+
+## Smart Home Screen
+- נוסף אזור גישה מהירה במסך הבית
+- fast_paths.json מחובר בפועל ל-UI
+- הכפתורים החשובים מופיעים למעלה
+- שיפור שימוש יומיומי בנייד
