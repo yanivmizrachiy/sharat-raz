@@ -366,3 +366,8 @@ sharat-raz (UI/PWA)
 - נוסף guard למניעת טעינת screenshot כפולה
 - נוסף רענון מחזורי לדיאגנוסטיקה
 - הופחת עומס refresh מיותר
+\n\n## Global Connectivity Hardening
+- נוסף reports/global_connectivity_status.json
+- נוסף חיווי חיבור מכל מקום באפליקציה
+- remote_state הורחב עם local_ready / outside_ready / global_ready
+- ההבחנה בין חיבור תפעולי לבין חיבור גלובלי מוצגת ומסונכרנת

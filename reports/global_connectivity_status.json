@@ -1,0 +1,18 @@
+{
+  "ts": "2026-03-26T19:05:29.046277",
+  "api_ok": true,
+  "listener_ok": true,
+  "ssh_ok": true,
+  "queue_ok": true,
+  "wol_ok": true,
+  "tailscale_ok": false,
+  "local_ready": true,
+  "outside_ready": true,
+  "global_ready": false,
+  "summary": "partial",
+  "notes": [
+    "local_ready=true אומר שהשליטה המקומית מוכנה",
+    "outside_ready=true אומר שאפשר לעבוד בפועל גם מחוץ לבית",
+    "global_ready=true אומר שגם חיווי Tailscale מלא ותקין"
+  ]
+}

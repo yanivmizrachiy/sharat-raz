@@ -89,7 +89,7 @@ async function loadButtons(){
 
 loadFastPaths();
 loadButtons();
-refreshStatus();\nloadDiagnostics();
+refreshStatus();\nloadDiagnostics();\nloadGlobalConnectivity();
 setInterval(refreshStatus,8000);
 
 
@@ -158,3 +158,33 @@ async function loadDiagnostics(){
     `;
   }catch(e){}
 }
+
+
+async function loadGlobalConnectivity() {
+  try {
+    const res = await fetch("./reports/global_connectivity_status.json?ts=" + Date.now());
+    const d = await res.json();
+    const box = document.getElementById("globalConnectivityBox");
+    if (!box) return;
+
+    const pill = (label, value) => {
+      const cls = value === true ? "state-ok" : (value === false ? "state-bad" : "state-mid");
+      const txt = value === true ? "תקין" : (value === false ? "לא תקין" : String(value));
+      return `<div class="pill ${cls}">${label}: ${txt}</div>`;
+    };
+
+    box.innerHTML = `
+      ${pill("API", d.api_ok)}
+      ${pill("Listener", d.listener_ok)}
+      ${pill("SSH", d.ssh_ok)}
+      ${pill("Queue", d.queue_ok)}
+      ${pill("WOL", d.wol_ok)}
+      ${pill("Tailscale", d.tailscale_ok)}
+      ${pill("Local", d.local_ready)}
+      ${pill("Outside", d.outside_ready)}
+      ${pill("Global", d.global_ready)}
+      <pre style="margin-top:12px;white-space:pre-wrap">${JSON.stringify(d, null, 2)}</pre>
+    `;
+  } catch (e) {}
+}
+\nsetInterval(loadGlobalConnectivity, 20000);\n
