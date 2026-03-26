@@ -24,6 +24,11 @@
       "label": "רשימת קבצים",
       "target": "pc",
       "action": "dir"
+    },
+    {
+      "label": "כבה מחשב",
+      "target": "pc",
+      "action": "shutdown /s /t 0"
     }
   ],
   "מצלמה": [
