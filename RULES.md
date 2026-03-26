@@ -345,3 +345,8 @@ sharat-raz (UI/PWA)
 - fast_paths.json מחובר בפועל ל-UI
 - הכפתורים החשובים מופיעים למעלה
 - שיפור שימוש יומיומי בנייד
+\n\n## Remote Runtime Check
+- נוסף reports/remote_runtime_check.json
+- נוסף חישוב outside_ready
+- נוסף חישוב global_ready
+- ההבדל בין חיבור תפעולי לבין חיווי עולמי מתועד ומסונכרן

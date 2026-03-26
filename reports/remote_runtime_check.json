@@ -1,0 +1,17 @@
+{
+  "ts": "2026-03-26T17:16:54.714483",
+  "listener_ok": true,
+  "api_ok": true,
+  "ssh_ok": true,
+  "tailscale_ok": false,
+  "queue_ok": true,
+  "wol_ready": true,
+  "outside_ready": true,
+  "global_ready": false,
+  "summary": "partial",
+  "notes": [
+    "outside_ready=true אומר שהמערכת התפעולית מוכנה",
+    "global_ready=true אומר שגם חיווי Tailscale תקין",
+    "אם global_ready=false אבל outside_ready=true, המערכת עובדת אך חיווי החוץ עדיין חלקי"
+  ]
+}
