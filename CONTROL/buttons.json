@@ -1,82 +1,44 @@
 {
-  "מחשב סלון": [
+  "regular": [
     {
-      "label": "בדוק מצב מחשב",
+      "group": "מחשב סלון",
+      "label": "פתח Chrome",
       "target": "pc",
-      "action": "hostname"
+      "action": "start chrome"
     },
     {
-      "label": "מי מחובר",
+      "group": "מחשב סלון",
+      "label": "פתח Zoom",
       "target": "pc",
-      "action": "whoami"
+      "action": "start zoom"
     },
     {
-      "label": "מידע מערכת",
+      "group": "מחשב סלון",
+      "label": "פתח מסמכים",
       "target": "pc",
-      "action": "systeminfo"
+      "action": "start explorer %USERPROFILE%\\\\Documents"
     },
     {
-      "label": "בדוק רשת",
+      "group": "מחשב סלון",
+      "label": "פתח שולחן עבודה",
       "target": "pc",
-      "action": "ipconfig"
-    },
+      "action": "start explorer %USERPROFILE%\\\\Desktop"
+    }
+  ],
+  "sensitive": [
     {
-      "label": "רשימת קבצים",
+      "group": "מערכת",
+      "label": "רענון רשת",
       "target": "pc",
-      "action": "dir"
-    },
+      "action": "ipconfig /release && ipconfig /renew"
+    }
+  ],
+  "dangerous": [
     {
+      "group": "מחשב סלון",
       "label": "כבה מחשב",
       "target": "pc",
       "action": "shutdown /s /t 0"
-    }
-  ],
-  "מצלמה": [
-    {
-      "label": "בדוק מצלמה",
-      "target": "pc",
-      "action": "wmic path Win32_PnPEntity get Name,Status"
-    },
-    {
-      "label": "חפש מצלמה",
-      "target": "pc",
-      "action": "wmic path Win32_PnPEntity get Name | findstr /i camera"
-    }
-  ],
-  "מערכת": [
-    {
-      "label": "רענון מצב",
-      "target": "pc",
-      "action": "hostname"
-    }
-  ],
-  "מערכת מתקדמת": [
-    {
-      "label": "תהליכים פעילים",
-      "target": "pc",
-      "action": "tasklist"
-    },
-    {
-      "label": "בדוק Tailscale",
-      "target": "pc",
-      "action": "ipconfig"
-    },
-    {
-      "label": "בדוק שירותים",
-      "target": "pc",
-      "action": "sc query type= service state= all"
-    },
-    {
-      "label": "סטטוס משתמש",
-      "target": "pc",
-      "action": "query user"
-    }
-  ],
-  "מסך": [
-    {
-      "label": "בדוק מסך",
-      "target": "pc",
-      "action": "powershell -NoProfile -Command \"Get-CimInstance Win32_DesktopMonitor | Select-Object Name,Status,MonitorType | ConvertTo-Json -Compress\""
     }
   ]
 }

@@ -350,3 +350,8 @@ sharat-raz (UI/PWA)
 - נוסף חישוב outside_ready
 - נוסף חישוב global_ready
 - ההבדל בין חיבור תפעולי לבין חיווי עולמי מתועד ומסונכרן
+\n\n## Real Control Layer
+- נוספו כפתורי שליטה אמיתיים למחשב סלון
+- פתיחת Chrome, Zoom, מסמכים ושולחן עבודה
+- סיווג פעולות: regular / sensitive / dangerous
+- הפיכת האפליקציה לשלט עבודה אמיתי
