@@ -1,47 +1,86 @@
 const API = "http://127.0.0.1:8791";
 const el = (id) => document.getElementById(id);
 let deferredPrompt = null;
+let lastRefreshAt = null;
 
 async function api(path, opts = {}) {
   const res = await fetch(API + path, {
     ...opts,
     headers: { "Content-Type": "application/json", ...(opts.headers || {}) }
   });
-  if (!res.ok) throw new Error("HTTP " + res.status);
-  return res.json();
+  const text = await res.text();
+  let data = {};
+  try { data = text ? JSON.parse(text) : {}; }
+  catch { throw new Error("תגובה לא תקינה מהשרת: " + text.slice(0, 300)); }
+  if (!res.ok) throw new Error(data.error || ("HTTP " + res.status));
+  return data;
 }
 
-function setText(id, value) { const n = el(id); if (n) n.textContent = value; }
+function setText(id, value) {
+  const n = el(id);
+  if (n) n.textContent = value;
+}
+
+function renderOutput(obj) {
+  const node = el("output");
+  if (!node) return;
+  node.textContent = typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
+}
+
+function renderError(message) {
+  const node = el("errorBox");
+  if (!node) return;
+  node.textContent = message || "אין שגיאות כרגע.";
+}
+
+function stampNow() {
+  const d = new Date();
+  return d.toLocaleString("he-IL");
+}
 
 async function refreshStatus() {
   try {
     const data = await api("/status");
+    lastRefreshAt = stampNow();
     setText("summary", "האפליקציה מחוברת ל־API המקומי ופועלת");
     setText("githubState", "מסונכרן");
     setText("salonState", data.pc_state || "לא ידוע");
     setText("roomState", "בהמשך");
     setText("n8nState", data.n8n_state || "לא ידוע");
-    el("output").textContent = JSON.stringify(data.last_result || {}, null, 2);
+    renderOutput({
+      עודכן_ב: lastRefreshAt,
+      תוצאה_אחרונה: data.last_result || {},
+      פקודה_נוכחית: data.next_command || {},
+      מצב_תור: data.queue_state || "לא ידוע"
+    });
+    renderError("אין שגיאות כרגע.");
   } catch (e) {
     setText("summary", "אין גישה ל־API המקומי ב־Termux");
     setText("githubState", "שגיאה");
     setText("salonState", "--");
     setText("roomState", "--");
     setText("n8nState", "--");
-    el("output").textContent = "שגיאה: " + e.message;
+    renderError("שגיאת רענון: " + e.message);
   }
 }
 
 async function sendCommand(target, action, params = {}) {
   try {
+    renderError("אין שגיאות כרגע.");
+    renderOutput({נשלח:true, target, action, params, זמן: stampNow()});
     const data = await api("/command", {
       method: "POST",
       body: JSON.stringify({ target, action, params })
     });
-    el("output").textContent = JSON.stringify(data, null, 2);
+    renderOutput({
+      נשלח: true,
+      queued: data.queued || {},
+      git: data.git || [],
+      זמן: stampNow()
+    });
     await refreshStatus();
   } catch (e) {
-    el("output").textContent = "שגיאת שליחה: " + e.message;
+    renderError("שגיאת שליחה: " + e.message);
   }
 }
 
@@ -67,7 +106,7 @@ async function loadButtons() {
       });
     });
   } catch (e) {
-    el("output").textContent = "שגיאת טעינת כפתורים: " + e.message;
+    renderError("שגיאת טעינת כפתורים: " + e.message);
   }
 }
 
@@ -93,14 +132,21 @@ el("sendBtn")?.addEventListener("click", async () => {
   const raw = el("params").value.trim();
   let params = {};
   if (raw) {
-    try { params = JSON.parse(raw); } catch { el("output").textContent = "JSON לא תקין"; return; }
+    try { params = JSON.parse(raw); }
+    catch {
+      renderError("JSON לא תקין בשדה הפרמטרים.");
+      return;
+    }
   }
-  if (!action) { el("output").textContent = "חסר action"; return; }
+  if (!action) {
+    renderError("חסר action.");
+    return;
+  }
   await sendCommand(target, action, params);
 });
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./sw.js").catch(console.error);
+  navigator.serviceWorker.register("./sw.js").catch(err => renderError("שגיאת Service Worker: " + err.message));
 }
 
 loadButtons();
