@@ -1,0 +1,36 @@
+{
+  "מחשב סלון": [
+    {
+      "label": "בדוק מצב מחשב",
+      "target": "pc",
+      "action": "hostname"
+    },
+    {
+      "label": "מי מחובר",
+      "target": "pc",
+      "action": "whoami"
+    },
+    {
+      "label": "מידע מערכת",
+      "target": "pc",
+      "action": "systeminfo"
+    },
+    {
+      "label": "בדוק רשת",
+      "target": "pc",
+      "action": "ipconfig"
+    },
+    {
+      "label": "רשימת קבצים",
+      "target": "pc",
+      "action": "dir"
+    }
+  ],
+  "מערכת": [
+    {
+      "label": "רענון מצב",
+      "target": "pc",
+      "action": "hostname"
+    }
+  ]
+}
