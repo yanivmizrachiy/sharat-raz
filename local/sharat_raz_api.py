@@ -9,6 +9,8 @@ STATE_DIR = os.path.join(CONTROL_DIR, "STATE")
 NEXT_FILE = os.path.join(STATE_DIR, "NEXT_COMMAND.json")
 LAST_FILE = os.path.join(STATE_DIR, "LAST_RESULT.json")
 BUTTONS_FILE = os.path.join(APP_DIR, "CONTROL", "buttons.json")
+HEALTH_FILE = os.path.join(APP_DIR, "CONTROL", "system_health.json")
+DIAG_FILE = os.path.join(APP_DIR, "reports", "runtime_diagnostics.json")
 API_PORT = 8791
 
 os.makedirs(STATE_DIR, exist_ok=True)
@@ -38,20 +40,6 @@ def normalize_target(value):
     if v in ("wol", "wake", "wake_salon", "הדלק מחשב"):
         return "wol"
     return v
-
-def quick_pc_state():
-    try:
-        p = run(["ssh","-o","BatchMode=yes","-o","ConnectTimeout=4","room-pc","echo","OK"])
-        return "מחובר" if p.returncode == 0 and "OK" in p.stdout else "לא מחובר"
-    except Exception:
-        return "לא מחובר"
-
-def quick_n8n_state():
-    try:
-        p = run(["curl","-s","--max-time","4","http://127.0.0.1:5678"])
-        return "מחובר" if p.returncode == 0 else "לא מחובר"
-    except Exception:
-        return "לא מחובר"
 
 def git_sync_queue():
     steps = []
@@ -87,17 +75,13 @@ class H(BaseHTTPRequestHandler):
             return self._send(200, {"ok": True, "buttons": read_json(BUTTONS_FILE, {})})
 
         if self.path == "/status":
-            last = read_json(LAST_FILE, {})
-            nxt = read_json(NEXT_FILE, {})
-            payload = {
-                "api_ok": True,
-                "pc_state": quick_pc_state(),
-                "n8n_state": quick_n8n_state(),
-                "queue_state": nxt.get("status", "לא ידוע") if isinstance(nxt, dict) else "לא ידוע",
-                "next_command": nxt,
-                "last_result": last
-            }
-            return self._send(200, payload)
+            return self._send(200, {
+                "ok": True,
+                "health": read_json(HEALTH_FILE, {}),
+                "diagnostics": read_json(DIAG_FILE, {}),
+                "last_result": read_json(LAST_FILE, {}),
+                "next_command": read_json(NEXT_FILE, {})
+            })
 
         return self._send(404, {"ok": False, "error": "not_found"})
 

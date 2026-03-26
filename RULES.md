@@ -271,3 +271,10 @@ sharat-raz (UI/PWA)
   - ~/server-core/services/watchdog.sh
   - ~/server-core/services/run-health-cycle.sh
 
+
+
+## Diagnostics Layer
+- נוסף endpoint /status יציב
+- מחזיר health + diagnostics אמיתיים
+- מחזיר גם last_result + next_command
+- מבוסס watchdog snapshots
