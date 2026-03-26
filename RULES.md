@@ -315,3 +315,9 @@ sharat-raz (UI/PWA)
 - כל השלבים הושלמו
 - אין פעולות חסרות
 - המערכת מוכנה לשימוש אמיתי יומיומי
+
+
+## Screenshot API
+- נוסף endpoint /latest-screenshot
+- נוסף endpoint /capture-screenshot
+- ה-API מחזיר גם screenshot_exists ו-screenshot_size ב-/status

@@ -11,9 +11,11 @@ LAST_FILE = os.path.join(STATE_DIR, "LAST_RESULT.json")
 BUTTONS_FILE = os.path.join(APP_DIR, "CONTROL", "buttons.json")
 HEALTH_FILE = os.path.join(APP_DIR, "CONTROL", "system_health.json")
 DIAG_FILE = os.path.join(APP_DIR, "reports", "runtime_diagnostics.json")
+SHOT_FILE = os.path.join(APP_DIR, "live", "salon-latest.png")
 API_PORT = 8791
 
 os.makedirs(STATE_DIR, exist_ok=True)
+os.makedirs(os.path.join(APP_DIR, "live"), exist_ok=True)
 
 def read_json(path, default):
     try:
@@ -39,6 +41,8 @@ def normalize_target(value):
         return "n8n"
     if v in ("wol", "wake", "wake_salon", "הדלק מחשב"):
         return "wol"
+    if v in ("screenshot", "screen", "capture_salon", "צילום מסך"):
+        return "screenshot"
     return v
 
 def git_sync_queue():
@@ -53,7 +57,7 @@ def git_sync_queue():
     return [{"code": x.returncode, "stdout": x.stdout[-300:], "stderr": x.stderr[-300:]} for x in steps]
 
 class H(BaseHTTPRequestHandler):
-    def _send(self, code=200, payload=None):
+    def _send_json(self, code=200, payload=None):
         raw = json.dumps(payload or {}, ensure_ascii=False).encode("utf-8")
         self.send_response(code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -64,45 +68,73 @@ class H(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(raw)
 
+    def _send_png(self, path):
+        if not os.path.exists(path):
+            return self._send_json(404, {"ok": False, "error": "screenshot_not_found"})
+        with open(path, "rb") as f:
+            raw = f.read()
+        self.send_response(200)
+        self.send_header("Content-Type", "image/png")
+        self.send_header("Content-Length", str(len(raw)))
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(raw)
+
     def do_OPTIONS(self):
-        self._send(200, {"ok": True})
+        self._send_json(200, {"ok": True})
 
     def do_GET(self):
         if self.path == "/health":
-            return self._send(200, {"ok": True, "service": "sharat-raz-api", "port": API_PORT, "ts": time.time()})
-
+            return self._send_json(200, {"ok": True, "service": "sharat-raz-api", "port": API_PORT, "ts": time.time()})
         if self.path == "/buttons":
-            return self._send(200, {"ok": True, "buttons": read_json(BUTTONS_FILE, {})})
-
+            return self._send_json(200, {"ok": True, "buttons": read_json(BUTTONS_FILE, {})})
         if self.path == "/status":
-            return self._send(200, {
+            return self._send_json(200, {
                 "ok": True,
                 "health": read_json(HEALTH_FILE, {}),
                 "diagnostics": read_json(DIAG_FILE, {}),
                 "last_result": read_json(LAST_FILE, {}),
-                "next_command": read_json(NEXT_FILE, {})
+                "next_command": read_json(NEXT_FILE, {}),
+                "screenshot_exists": os.path.exists(SHOT_FILE),
+                "screenshot_size": os.path.getsize(SHOT_FILE) if os.path.exists(SHOT_FILE) else 0
             })
-
-        return self._send(404, {"ok": False, "error": "not_found"})
+        if self.path.startswith("/latest-screenshot"):
+            return self._send_png(SHOT_FILE)
+        return self._send_json(404, {"ok": False, "error": "not_found"})
 
     def do_POST(self):
+        if self.path == "/capture-screenshot":
+            payload = {
+                "request_id": str(uuid.uuid4()),
+                "command": "run",
+                "target": "screenshot",
+                "action": "capture_salon",
+                "params": {},
+                "status": "pending",
+                "source": "sharat-raz"
+            }
+            write_json(NEXT_FILE, payload)
+            git_steps = git_sync_queue()
+            return self._send_json(200, {"ok": True, "queued": payload, "git": git_steps})
+
         if self.path != "/command":
-            return self._send(404, {"ok": False, "error": "not_found"})
+            return self._send_json(404, {"ok": False, "error": "not_found"})
         try:
             length = int(self.headers.get("Content-Length","0"))
             body = self.rfile.read(length).decode("utf-8")
             data = json.loads(body) if body else {}
         except Exception as e:
-            return self._send(400, {"ok": False, "error": "bad_json", "detail": str(e)})
+            return self._send_json(400, {"ok": False, "error": "bad_json", "detail": str(e)})
 
         target = normalize_target(data.get("target"))
         action = (data.get("action") or "").strip()
         params = data.get("params") or {}
 
-        if target not in ("pc", "room-pc", "n8n", "wol"):
-            return self._send(400, {"ok": False, "error": "bad_target", "got": target})
+        if target not in ("pc", "room-pc", "n8n", "wol", "screenshot"):
+            return self._send_json(400, {"ok": False, "error": "bad_target", "got": target})
         if not action:
-            return self._send(400, {"ok": False, "error": "missing_action"})
+            return self._send_json(400, {"ok": False, "error": "missing_action"})
 
         payload = {
             "request_id": str(uuid.uuid4()),
@@ -113,10 +145,9 @@ class H(BaseHTTPRequestHandler):
             "status": "pending",
             "source": "sharat-raz"
         }
-
         write_json(NEXT_FILE, payload)
         git_steps = git_sync_queue()
-        return self._send(200, {"ok": True, "queued": payload, "git": git_steps})
+        return self._send_json(200, {"ok": True, "queued": payload, "git": git_steps})
 
 def main():
     server = ThreadingHTTPServer(("127.0.0.1", API_PORT), H)
