@@ -1,0 +1,10 @@
+# temp
+*.bak.*
+__pycache__/
+
+# runtime
+live/
+tmp/
+
+# backups
+backup/
