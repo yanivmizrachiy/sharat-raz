@@ -84,7 +84,7 @@ async function loadButtons(){
 
 loadFastPaths();
 loadButtons();
-refreshStatus();
+refreshStatus();\nloadDiagnostics();
 setInterval(refreshStatus,8000);
 
 
@@ -130,4 +130,22 @@ async function loadFastPaths() {
     const box = el("errorBox");
     if (box) box.textContent = "שגיאת גישה מהירה: " + e.message;
   }
+}
+
+
+async function loadDiagnostics(){
+  try{
+    const r = await fetch("./reports/mobile_diagnostics_view.json?ts="+Date.now());
+    const d = await r.json();
+    const box = document.getElementById("diagBox");
+    if(!box) return;
+    box.innerHTML = `
+      <div>API: ${d.api}</div>
+      <div>Listener: ${d.listener}</div>
+      <div>SSH: ${d.ssh}</div>
+      <div>Queue: ${d.queue}</div>
+      <div>WOL: ${d.wol}</div>
+      <b>Summary: ${d.summary}</b>
+    `;
+  }catch(e){}
 }

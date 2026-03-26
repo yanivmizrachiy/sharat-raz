@@ -355,3 +355,8 @@ sharat-raz (UI/PWA)
 - פתיחת Chrome, Zoom, מסמכים ושולחן עבודה
 - סיווג פעולות: regular / sensitive / dangerous
 - הפיכת האפליקציה לשלט עבודה אמיתי
+\n\n## Diagnostics Mobile View
+- נוסף reports/mobile_diagnostics_view.json
+- מצב מערכת מוצג באפליקציה
+- בדיקות: API, listener, SSH, queue, WOL
+- מאפשר להבין תקלות בלי טרמינל
