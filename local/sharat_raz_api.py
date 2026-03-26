@@ -35,6 +35,8 @@ def normalize_target(value):
         return "room-pc"
     if v in ("n8n",):
         return "n8n"
+    if v in ("wol", "wake", "wake_salon", "הדלק מחשב"):
+        return "wol"
     return v
 
 def quick_pc_state():
@@ -113,7 +115,7 @@ class H(BaseHTTPRequestHandler):
         action = (data.get("action") or "").strip()
         params = data.get("params") or {}
 
-        if target not in ("pc", "room-pc", "n8n"):
+        if target not in ("pc", "room-pc", "n8n", "wol"):
             return self._send(400, {"ok": False, "error": "bad_target", "got": target})
         if not action:
             return self._send(400, {"ok": False, "error": "missing_action"})
