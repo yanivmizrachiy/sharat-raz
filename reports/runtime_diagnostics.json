@@ -1,0 +1,11 @@
+{
+  "ts": "2026-03-26T10:31:09+02:00",
+  "processes": {
+    "listener": [],
+    "api": []
+  },
+  "files": {
+    "next_command": true,
+    "last_result": true
+  }
+}
