@@ -278,3 +278,10 @@ sharat-raz (UI/PWA)
 - מחזיר health + diagnostics אמיתיים
 - מחזיר גם last_result + next_command
 - מבוסס watchdog snapshots
+
+
+## Safety Layer
+- נוסף CONTROL/actions_policy.json
+- כל הכפתורים מסווגים ל-safe / sensitive / dangerous
+- פעולות מסוכנות יסומנו לשלב אישור UI נפרד
+- בשלב הזה נבנה מקור אמת בטיחותי לפני שינויי ממשק

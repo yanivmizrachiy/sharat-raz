@@ -1,0 +1,92 @@
+{
+  "safe": [
+    {
+      "group": "מחשב סלון",
+      "label": "בדוק מצב מחשב",
+      "target": "pc",
+      "action": "hostname"
+    },
+    {
+      "group": "מחשב סלון",
+      "label": "מי מחובר",
+      "target": "pc",
+      "action": "whoami"
+    },
+    {
+      "group": "מחשב סלון",
+      "label": "רשימת קבצים",
+      "target": "pc",
+      "action": "dir"
+    },
+    {
+      "group": "מצלמה",
+      "label": "בדוק מצלמה",
+      "target": "pc",
+      "action": "wmic path Win32_PnPEntity get Name,Status"
+    },
+    {
+      "group": "מצלמה",
+      "label": "חפש מצלמה",
+      "target": "pc",
+      "action": "wmic path Win32_PnPEntity get Name | findstr /i camera"
+    },
+    {
+      "group": "מערכת",
+      "label": "רענון מצב",
+      "target": "pc",
+      "action": "hostname"
+    },
+    {
+      "group": "מערכת מתקדמת",
+      "label": "בדוק שירותים",
+      "target": "pc",
+      "action": "sc query type= service state= all"
+    },
+    {
+      "group": "מסך",
+      "label": "בדוק מסך",
+      "target": "pc",
+      "action": "powershell -NoProfile -Command \"Get-CimInstance Win32_DesktopMonitor | Select-Object Name,Status,MonitorType | ConvertTo-Json -Compress\""
+    }
+  ],
+  "sensitive": [
+    {
+      "group": "מחשב סלון",
+      "label": "מידע מערכת",
+      "target": "pc",
+      "action": "systeminfo"
+    },
+    {
+      "group": "מחשב סלון",
+      "label": "בדוק רשת",
+      "target": "pc",
+      "action": "ipconfig"
+    },
+    {
+      "group": "מערכת מתקדמת",
+      "label": "תהליכים פעילים",
+      "target": "pc",
+      "action": "tasklist"
+    },
+    {
+      "group": "מערכת מתקדמת",
+      "label": "בדוק Tailscale",
+      "target": "pc",
+      "action": "ipconfig"
+    },
+    {
+      "group": "מערכת מתקדמת",
+      "label": "סטטוס משתמש",
+      "target": "pc",
+      "action": "query user"
+    }
+  ],
+  "dangerous": [
+    {
+      "group": "מחשב סלון",
+      "label": "כבה מחשב",
+      "target": "pc",
+      "action": "shutdown /s /t 0"
+    }
+  ]
+}
