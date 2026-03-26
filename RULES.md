@@ -332,3 +332,9 @@ sharat-raz (UI/PWA)
 ## LIVE Mode
 - צילום כל 2 שניות
 - כפתורי התחלה/עצירה
+
+## Live State
+- נוסף CONTROL/live_state.json
+- נוספו sc-live-start ו-sc-live-stop
+- LIVE שומר PID ומצב ריצה אמיתי
+- נמנעת הרצה כפולה של LIVE
