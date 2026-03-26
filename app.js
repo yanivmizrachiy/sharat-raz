@@ -1,3 +1,8 @@
+let STATUS_REFRESH_MS = 10000;
+let DIAG_REFRESH_MS = 15000;
+let SCREENSHOT_REFRESH_MS = 3000;
+let SCREENSHOT_LOADING = false;
+
 const API = "http://127.0.0.1:8791";
 const el = (id) => document.getElementById(id);
 
@@ -92,8 +97,8 @@ async function captureScreenshot() {
   try {
     const r = await api("/capture-screenshot", { method: "POST" });
     render(r);
-    setTimeout(loadLatestScreenshot, 5000);
-    setTimeout(refreshStatus, 2500);
+    setTimeout(loadLatestScreenshot, 2500);
+    setTimeout(refreshStatus, 1800);
   } catch (e) {
     const box = el("errorBox");
     if (box) box.textContent = "שגיאת צילום מסך: " + e.message;
@@ -103,12 +108,16 @@ async function captureScreenshot() {
 function loadLatestScreenshot() {
   const img = el("shotImg");
   if (!img) return;
+  if (SCREENSHOT_LOADING) return;
+  SCREENSHOT_LOADING = true;
+  img.onload = () => { SCREENSHOT_LOADING = false; };
+  img.onerror = () => { SCREENSHOT_LOADING = false; };
   img.src = API + "/latest-screenshot?ts=" + Date.now();
 }
 
 document.getElementById("shotBtn")?.addEventListener("click", captureScreenshot);
-setInterval(loadLatestScreenshot, 12000);
-setTimeout(loadLatestScreenshot, 1000);
+setInterval(loadLatestScreenshot, SCREENSHOT_REFRESH_MS);
+setTimeout(loadLatestScreenshot, 1200);
 
 let LIVE=null; function startLive(){if(LIVE)return;LIVE=setInterval(loadLatestScreenshot,2000);} function stopLive(){if(LIVE){clearInterval(LIVE);LIVE=null;}}
 

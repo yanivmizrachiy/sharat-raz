@@ -360,3 +360,9 @@ sharat-raz (UI/PWA)
 - מצב מערכת מוצג באפליקציה
 - בדיקות: API, listener, SSH, queue, WOL
 - מאפשר להבין תקלות בלי טרמינל
+\n\n## Performance Stage
+- נוספו משתני refresh גלובליים
+- LIVE מתרענן בצורה קלה ומבוקרת יותר
+- נוסף guard למניעת טעינת screenshot כפולה
+- נוסף רענון מחזורי לדיאגנוסטיקה
+- הופחת עומס refresh מיותר
