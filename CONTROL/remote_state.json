@@ -1,0 +1,15 @@
+{
+  "remote_ready": true,
+  "tailscale_ok": false,
+  "ssh_ok": true,
+  "wol_ready": true,
+  "queue_ok": true,
+  "listener_count": 1,
+  "api_count": 1,
+  "ts": "2026-03-26T11:02:24+02:00",
+  "notes": [
+    "remote_ready=true רק אם listener+api+ssh תקינים",
+    "tailscale_ok=false אומר שחיבור עולמי עדיין לא חזק מספיק",
+    "wol_ready=true אומר שמסלול הדלקה מוכן ברמת מערכת"
+  ]
+}

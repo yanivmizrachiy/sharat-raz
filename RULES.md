@@ -293,3 +293,8 @@ sharat-raz (UI/PWA)
 - תצוגת מצב מערכת
 - אישור לפעולות מסוכנות
 
+\n\n## Strong Remote Control
+- נוסף CONTROL/remote_state.json
+- מצב שליטה מרחוק מחושב מה-health האמיתי
+- יש הבחנה בין ssh / tailscale / wol / queue
+- זהו מקור אמת למוכנות של שליטה מחוץ לבית
