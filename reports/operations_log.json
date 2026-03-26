@@ -1,0 +1,16 @@
+{
+  "ts": "2026-03-26T13:53:29.204020",
+  "summary": {
+    "listener_running": true,
+    "api_running": true,
+    "ssh_room_pc": true,
+    "tailscale_ok": false,
+    "wol_ready": true,
+    "queue_ok": true
+  },
+  "fast_paths_count": 5,
+  "notes": [
+    "זהו לוג תפעולי עמוק של מצב המערכת",
+    "הקובץ מבוסס על מצב אמיתי מקבצי הבקרה"
+  ]
+}

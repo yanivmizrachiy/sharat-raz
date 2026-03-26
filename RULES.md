@@ -303,3 +303,8 @@ sharat-raz (UI/PWA)
 - נוצרה רשימת כפתורי גישה מהירה
 - הקובץ מיועד להאיץ שימוש יומיומי באפליקציה
 - מקור אמת לקיצורי דרך חשובים
+\n\n## Deep Operational Logging
+- נוסף reports/operations_log.json
+- נוסף reports/final_system_status.json
+- יש snapshot מסודר של מצב המערכת
+- יש לוג תפעולי עמוק מסונכרן לגיטאב
