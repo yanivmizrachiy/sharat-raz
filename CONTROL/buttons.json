@@ -26,6 +26,18 @@
       "action": "dir"
     }
   ],
+  "מצלמה": [
+    {
+      "label": "בדוק מצלמה",
+      "target": "pc",
+      "action": "wmic path Win32_PnPEntity get Name,Status"
+    },
+    {
+      "label": "חפש מצלמה",
+      "target": "pc",
+      "action": "wmic path Win32_PnPEntity get Name | findstr /i camera"
+    }
+  ],
   "מערכת": [
     {
       "label": "רענון מצב",
