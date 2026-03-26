@@ -5,100 +5,102 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#facc15" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="שרת רז" />
   <title>שרת רז</title>
   <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div class="title-wrap">
-        <div class="app-icon">ש</div>
-        <div>
+      <div class="brand">
+        <img src="icons/icon-192.png" alt="שרת רז" class="logo" />
+        <div class="titles">
           <h1>שרת רז</h1>
-          <p>שליטה נוחה בעברית • מחשב סלון ראשון • GitHub מסונכרן</p>
+          <p id="summary">שלט חכם בעברית למחשב סלון</p>
         </div>
       </div>
       <button id="installBtn" class="ghost hidden">התקן למסך הבית</button>
     </header>
 
-    <main class="grid">
-      <section class="card hero">
-        <div class="hero-head">
-          <div>
-            <h2>מצב מערכת</h2>
-            <p id="healthLine">טוען...</p>
-          </div>
-          <button class="primary" id="refreshBtn">רענון</button>
+    <section class="hero card">
+      <div class="hero-head">
+        <div>
+          <h2>מצב מערכת</h2>
+          <p class="sub">הכול מסונכרן דרך GitHub ומבוקר דרך Termux</p>
         </div>
-        <div class="status-grid">
-          <div class="pill"><span>API מקומי</span><strong id="apiState">--</strong></div>
-          <div class="pill"><span>מחשב סלון</span><strong id="pcState">--</strong></div>
-          <div class="pill"><span>GitHub Queue</span><strong id="queueState">--</strong></div>
-          <div class="pill"><span>n8n</span><strong id="n8nState">--</strong></div>
+        <button id="refreshBtn" class="primary">רענון</button>
+      </div>
+
+      <div class="status-grid">
+        <div class="status-box">
+          <span>GitHub</span>
+          <strong id="githubState">טוען...</strong>
         </div>
-      </section>
-
-      <section class="card">
-        <h2>פעולות מהירות — מחשב סלון</h2>
-        <div class="buttons">
-          <button class="quick" data-target="pc" data-action="hostname">שם מחשב סלון</button>
-          <button class="quick" data-target="pc" data-action="whoami">משתמש פעיל</button>
-          <button class="quick" data-target="pc" data-action="systeminfo">מידע מערכת</button>
-          <button class="quick" data-target="pc" data-action="ipconfig">כתובות רשת</button>
-          <button class="quick" data-target="pc" data-action="dir">רשימת קבצים</button>
-          <button class="quick" data-target="pc" data-action="echo SHARAT_RAZ_OK">בדיקת חיבור</button>
+        <div class="status-box">
+          <span>מחשב סלון</span>
+          <strong id="salonState">טוען...</strong>
         </div>
-      </section>
-
-      <section class="card">
-        <h2>n8n</h2>
-        <div class="buttons">
-          <button class="quick" data-target="n8n" data-action="chat">שאל את n8n</button>
-          <button class="quick" data-target="n8n" data-action="GetTodayCalendar">יומן להיום</button>
+        <div class="status-box">
+          <span>מחשב חדר מחשב</span>
+          <strong id="roomState">בהמשך</strong>
         </div>
-        <textarea id="n8nText" rows="4" placeholder="כתוב כאן הודעה ל-n8n..."></textarea>
-      </section>
-
-      <section class="card">
-        <h2>שליחת פקודה מותאמת</h2>
-        <label>יעד</label>
-        <select id="target">
-          <option value="pc">מחשב סלון</option>
-          <option value="n8n">n8n</option>
-        </select>
-        <label>Action</label>
-        <input id="action" placeholder="למשל hostname או chat" />
-        <label>Params JSON</label>
-        <textarea id="params" rows="5" placeholder="{&quot;text&quot;:&quot;שלום&quot;}"></textarea>
-        <button class="primary full" id="sendBtn">שלח פקודה</button>
-      </section>
-
-      <section class="card">
-        <h2>תוצאה אחרונה</h2>
-        <pre id="lastResult">טוען...</pre>
-      </section>
-
-      <section class="card">
-        <h2>קישורים מהירים</h2>
-        <div class="buttons">
-          <a class="quick link" href="https://github.com/yanivmizrachiy/my-assistant" target="_blank" rel="noopener">my-assistant</a>
-          <a class="quick link" href="https://github.com/yanivmizrachiy/server-core" target="_blank" rel="noopener">server-core</a>
-          <a class="quick link" href="https://github.com/yanivmizrachiy/n8n" target="_blank" rel="noopener">n8n</a>
-          <a class="quick link" href="https://github.com/yanivmizrachiy/sharat-raz" target="_blank" rel="noopener">sharat-raz</a>
+        <div class="status-box">
+          <span>n8n</span>
+          <strong id="n8nState">טוען...</strong>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
 
-    <footer class="footer">
-      <span>עברית מלאה • RTL • עיצוב צהוב • GitHub מסונכרן</span>
-    </footer>
+    <section class="card">
+      <div class="section-head">
+        <h2>כפתורי שליטה</h2>
+        <p>הכפתורים נטענים אוטומטית מ־GitHub</p>
+      </div>
+      <div class="buttons"></div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <h2>שליחה מותאמת</h2>
+        <p>לפעולות מיוחדות ומתקדמות</p>
+      </div>
+
+      <label>יעד</label>
+      <select id="target">
+        <option value="pc">מחשב סלון</option>
+        <option value="room-pc">מחשב חדר מחשב</option>
+        <option value="n8n">n8n</option>
+      </select>
+
+      <label>פעולה</label>
+      <input id="action" placeholder="למשל hostname / whoami / ipconfig" />
+
+      <label>פרמטרים (JSON)</label>
+      <textarea id="params" rows="5" placeholder={text:שלום}></textarea>
+
+      <button id="sendBtn" class="primary wide">שלח פקודה</button>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <h2>פלט אחרון</h2>
+        <p>תוצאה אמיתית מהמחשב או מהמערכת</p>
+      </div>
+      <pre id="output">טוען...</pre>
+    </section>
+
+    <section class="card error-card">
+      <div class="section-head">
+        <h2>שגיאה אחרונה</h2>
+        <p>אם משהו נכשל, זה יופיע כאן בצורה ברורה</p>
+      </div>
+      <pre id="errorBox">אין שגיאות כרגע.</pre>
+    </section>
   </div>
-
   <script src="app.js"></script>
 </body>
 </html>
