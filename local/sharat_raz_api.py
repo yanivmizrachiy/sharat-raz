@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+import json, os, subprocess, time, uuid
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+HOME = os.path.expanduser("~")
+CONTROL_DIR = os.path.join(HOME, "my-assistant")
+STATE_DIR = os.path.join(CONTROL_DIR, "STATE")
+NEXT_FILE = os.path.join(STATE_DIR, "NEXT_COMMAND.json")
+LAST_FILE = os.path.join(STATE_DIR, "LAST_RESULT.json")
+API_PORT = 8791
+
+os.makedirs(STATE_DIR, exist_ok=True)
+
+def read_json(path, default):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return default
+
+def write_json(path, data):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+def run(cmd, cwd=None):
+    return subprocess.run(cmd, cwd=cwd, text=True, capture_output=True)
+
+def quick_pc_state():
+    try:
+        p = run(["ssh","-o","BatchMode=yes","-o","ConnectTimeout=4","room-pc","echo","OK"])
+        return "מחובר" if p.returncode == 0 and "OK" in p.stdout else "לא מחובר"
+    except Exception:
+        return "לא מחובר"
+
+def quick_n8n_state():
+    try:
+        p = run(["curl","-s","--max-time","4","http://127.0.0.1:5678"])
+        return "מחובר" if p.returncode == 0 else "לא מחובר"
+    except Exception:
+        return "לא מחובר"
+
+class H(BaseHTTPRequestHandler):
+    def _send(self, code=200, payload=None):
+        raw = json.dumps(payload or {}, ensure_ascii=False).encode("utf-8")
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(raw)))
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+        self.wfile.write(raw)
+
+    def do_OPTIONS(self):
+        self._send(200, {"ok": True})
+
+    def do_GET(self):
+        if self.path == "/health":
+            return self._send(200, {"ok": True, "service": "sharat-raz-api", "port": API_PORT, "ts": time.time()})
+
+        if self.path == "/status":
+            last = read_json(LAST_FILE, {})
+            nxt = read_json(NEXT_FILE, {})
+            payload = {
+                "api_ok": True,
+                "pc_state": quick_pc_state(),
+                "n8n_state": quick_n8n_state(),
+                "queue_state": nxt.get("status", "לא ידוע") if isinstance(nxt, dict) else "לא ידוע",
+                "next_command": nxt,
+                "last_result": last
+            }
+            return self._send(200, payload)
+
+        return self._send(404, {"ok": False, "error": "not_found"})
+
+    def do_POST(self):
+        if self.path != "/command":
+            return self._send(404, {"ok": False, "error": "not_found"})
+
+        try:
+            length = int(self.headers.get("Content-Length","0"))
+            body = self.rfile.read(length).decode("utf-8")
+            data = json.loads(body) if body else {}
+        except Exception as e:
+            return self._send(400, {"ok": False, "error": "bad_json", "detail": str(e)})
+
+        target = (data.get("target") or "").strip()
+        action = (data.get("action") or "").strip()
+        params = data.get("params") or {}
+
+        if target not in ("pc", "n8n"):
+            return self._send(400, {"ok": False, "error": "bad_target"})
+        if not action:
+            return self._send(400, {"ok": False, "error": "missing_action"})
+
+        payload = {
+            "request_id": str(uuid.uuid4()),
+            "command": "run",
+            "target": target,
+            "action": action,
+            "params": params,
+            "status": "pending",
+            "source": "sharat-raz"
+        }
+
+        write_json(NEXT_FILE, payload)
+
+        git_steps = []
+        try:
+            git_steps.append(run(["git","pull","--rebase"], cwd=CONTROL_DIR))
+            git_steps.append(run(["git","add","STATE/NEXT_COMMAND.json"], cwd=CONTROL_DIR))
+            git_steps.append(run(["git","commit","-m",f"sharat-raz: queue {target}:{action}"], cwd=CONTROL_DIR))
+            git_steps.append(run(["git","push"], cwd=CONTROL_DIR))
+        except Exception:
+            pass
+
+        return self._send(200, {
+            "ok": True,
+            "queued": payload,
+            "git": [
+                {"code": x.returncode, "stdout": x.stdout[-500:], "stderr": x.stderr[-500:]}
+                for x in git_steps
+            ]
+        })
+
+def main():
+    server = ThreadingHTTPServer(("127.0.0.1", API_PORT), H)
+    print(f"sharat-raz-api listening on 127.0.0.1:{API_PORT}", flush=True)
+    server.serve_forever()
+
+if __name__ == "__main__":
+    main()
