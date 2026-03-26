@@ -230,3 +230,10 @@ sharat-raz (UI/PWA)
 - alias: room-pc
 - בדיקת חיבור: ssh room-pc "echo CONNECTED"
 - חיבור נשמר גם מרחוק
+
+
+## הרחבת שליטה מהירה
+- נוספו כפתורי מערכת מתקדמת
+- נוספו כפתורי מסך בסיסיים
+- הכפתורים מסונכרנים ל-GitHub דרך CONTROL/buttons.json
+- כל הכפתורים נטענים מה-source of truth

@@ -44,5 +44,34 @@
       "target": "pc",
       "action": "hostname"
     }
+  ],
+  "מערכת מתקדמת": [
+    {
+      "label": "תהליכים פעילים",
+      "target": "pc",
+      "action": "tasklist"
+    },
+    {
+      "label": "בדוק Tailscale",
+      "target": "pc",
+      "action": "ipconfig"
+    },
+    {
+      "label": "בדוק שירותים",
+      "target": "pc",
+      "action": "sc query type= service state= all"
+    },
+    {
+      "label": "סטטוס משתמש",
+      "target": "pc",
+      "action": "query user"
+    }
+  ],
+  "מסך": [
+    {
+      "label": "בדוק מסך",
+      "target": "pc",
+      "action": "powershell -NoProfile -Command \"Get-CimInstance Win32_DesktopMonitor | Select-Object Name,Status,MonitorType | ConvertTo-Json -Compress\""
+    }
   ]
 }
