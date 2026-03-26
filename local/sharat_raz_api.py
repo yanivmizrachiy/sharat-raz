@@ -25,6 +25,16 @@ def write_json(path, data):
 def run(cmd, cwd=None):
     return subprocess.run(cmd, cwd=cwd, text=True, capture_output=True)
 
+def normalize_target(value):
+    v = (value or "").strip().lower()
+    if v in ("pc", "salon", "living-room", "living-room-pc", "מחשב סלון"):
+        return "pc"
+    if v in ("room-pc", "computer-room", "מחשב חדר מחשב"):
+        return "room-pc"
+    if v in ("n8n",):
+        return "n8n"
+    return v
+
 def quick_pc_state():
     try:
         p = run(["ssh","-o","BatchMode=yes","-o","ConnectTimeout=4","room-pc","echo","OK"])
@@ -38,6 +48,17 @@ def quick_n8n_state():
         return "מחובר" if p.returncode == 0 else "לא מחובר"
     except Exception:
         return "לא מחובר"
+
+def git_sync_queue():
+    steps = []
+    try:
+        steps.append(run(["git","pull","--rebase"], cwd=CONTROL_DIR))
+        steps.append(run(["git","add","STATE/NEXT_COMMAND.json"], cwd=CONTROL_DIR))
+        steps.append(run(["git","commit","-m","sharat-raz: queue command"], cwd=CONTROL_DIR))
+        steps.append(run(["git","push"], cwd=CONTROL_DIR))
+    except Exception:
+        pass
+    return [{"code": x.returncode, "stdout": x.stdout[-300:], "stderr": x.stderr[-300:]} for x in steps]
 
 class H(BaseHTTPRequestHandler):
     def _send(self, code=200, payload=None):
@@ -84,12 +105,12 @@ class H(BaseHTTPRequestHandler):
         except Exception as e:
             return self._send(400, {"ok": False, "error": "bad_json", "detail": str(e)})
 
-        target = (data.get("target") or "").strip()
+        target = normalize_target(data.get("target"))
         action = (data.get("action") or "").strip()
         params = data.get("params") or {}
 
-        if target not in ("pc", "n8n"):
-            return self._send(400, {"ok": False, "error": "bad_target"})
+        if target not in ("pc", "room-pc", "n8n"):
+            return self._send(400, {"ok": False, "error": "bad_target", "got": target})
         if not action:
             return self._send(400, {"ok": False, "error": "missing_action"})
 
@@ -104,23 +125,12 @@ class H(BaseHTTPRequestHandler):
         }
 
         write_json(NEXT_FILE, payload)
-
-        git_steps = []
-        try:
-            git_steps.append(run(["git","pull","--rebase"], cwd=CONTROL_DIR))
-            git_steps.append(run(["git","add","STATE/NEXT_COMMAND.json"], cwd=CONTROL_DIR))
-            git_steps.append(run(["git","commit","-m",f"sharat-raz: queue {target}:{action}"], cwd=CONTROL_DIR))
-            git_steps.append(run(["git","push"], cwd=CONTROL_DIR))
-        except Exception:
-            pass
+        git_steps = git_sync_queue()
 
         return self._send(200, {
             "ok": True,
             "queued": payload,
-            "git": [
-                {"code": x.returncode, "stdout": x.stdout[-500:], "stderr": x.stderr[-500:]}
-                for x in git_steps
-            ]
+            "git": git_steps
         })
 
 def main():
