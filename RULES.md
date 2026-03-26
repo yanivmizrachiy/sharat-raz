@@ -321,3 +321,9 @@ sharat-raz (UI/PWA)
 - נוסף endpoint /latest-screenshot
 - נוסף endpoint /capture-screenshot
 - ה-API מחזיר גם screenshot_exists ו-screenshot_size ב-/status
+
+
+## Screenshot UI
+- נוסף אזור תצוגת צילום מסך באפליקציה
+- נוסף כפתור "צלם עכשיו"
+- האפליקציה טוענת את latest-screenshot ישירות מה-API

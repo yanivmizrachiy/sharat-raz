@@ -85,3 +85,26 @@ async function loadButtons(){
 loadButtons();
 refreshStatus();
 setInterval(refreshStatus,8000);
+
+
+async function captureScreenshot() {
+  try {
+    const r = await api("/capture-screenshot", { method: "POST" });
+    render(r);
+    setTimeout(loadLatestScreenshot, 5000);
+    setTimeout(refreshStatus, 2500);
+  } catch (e) {
+    const box = el("errorBox");
+    if (box) box.textContent = "שגיאת צילום מסך: " + e.message;
+  }
+}
+
+function loadLatestScreenshot() {
+  const img = el("shotImg");
+  if (!img) return;
+  img.src = API + "/latest-screenshot?ts=" + Date.now();
+}
+
+document.getElementById("shotBtn")?.addEventListener("click", captureScreenshot);
+setInterval(loadLatestScreenshot, 12000);
+setTimeout(loadLatestScreenshot, 1000);
