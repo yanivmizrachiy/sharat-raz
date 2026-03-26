@@ -108,3 +108,5 @@ function loadLatestScreenshot() {
 document.getElementById("shotBtn")?.addEventListener("click", captureScreenshot);
 setInterval(loadLatestScreenshot, 12000);
 setTimeout(loadLatestScreenshot, 1000);
+
+let LIVE=null; function startLive(){if(LIVE)return;LIVE=setInterval(loadLatestScreenshot,2000);} function stopLive(){if(LIVE){clearInterval(LIVE);LIVE=null;}}
