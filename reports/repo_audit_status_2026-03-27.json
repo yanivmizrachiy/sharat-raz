@@ -1,0 +1,24 @@
+{
+  "ts": "2026-03-27T00:00:00Z",
+  "repo": "yanivmizrachiy/sharat-raz",
+  "audit_summary": "partial",
+  "verified": {
+    "pwa_exists": true,
+    "rules_exists": true,
+    "global_connectivity_panel_exists": true,
+    "screenshot_ui_exists": true,
+    "gitignore_runtime_cleanup_exists": true
+  },
+  "issues_found": [
+    "RULES.md contains contradictory progress/status sections",
+    "app.js contains escaped newline artifacts like \\n inside live code paths",
+    "index.html contains escaped newline artifacts and an invalid textarea placeholder",
+    "global connectivity still reports global_ready=false and tailscale_ok=false"
+  ],
+  "next_priority": [
+    "clean RULES.md into one consistent source of truth",
+    "repair app.js escaped newline artifacts",
+    "repair index.html invalid markup and ordering",
+    "finish real agent connectivity so Connected becomes true"
+  ]
+}
