@@ -33,7 +33,8 @@ function render(obj) {
 function confirmDanger(action,label){
   const s=(action+" "+label).toLowerCase();
   if(s.includes("shutdown")||s.includes("restart")||s.includes("כבה")){
-    return confirm("פעולה מסוכנת: "+label+"\nלהמשיך?");
+    return confirm("פעולה מסוכנת: "+label+"
+להמשיך?");
   }
   return true;
 }
@@ -89,7 +90,9 @@ async function loadButtons(){
 
 loadFastPaths();
 loadButtons();
-refreshStatus();\nloadDiagnostics();\nloadGlobalConnectivity();
+refreshStatus();
+loadDiagnostics();
+loadGlobalConnectivity();
 setInterval(refreshStatus,8000);
 
 
@@ -187,4 +190,5 @@ async function loadGlobalConnectivity() {
     `;
   } catch (e) {}
 }
-\nsetInterval(loadGlobalConnectivity, 20000);\n
+
+setInterval(loadGlobalConnectivity, 20000);

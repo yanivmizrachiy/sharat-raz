@@ -371,3 +371,9 @@ sharat-raz (UI/PWA)
 - נוסף חיווי חיבור מכל מקום באפליקציה
 - remote_state הורחב עם local_ready / outside_ready / global_ready
 - ההבחנה בין חיבור תפעולי לבין חיבור גלובלי מוצגת ומסונכרנת
+
+
+## System Status
+- UI stabilized
+- app.js cleaned
+- index.html fixed
